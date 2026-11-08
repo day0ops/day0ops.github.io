@@ -1,0 +1,175 @@
+/* ── Brand palette ───────────────────────────────────────────────── */
+:root {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-text-hi: #f8fafc;
+  --color-text-body: #94a3b8;
+  --color-muted: #64748b;
+  --color-primary: #38bdf8;
+  --color-warn: #fbbf24;
+  --color-oops: #fb923c;
+  --color-success: #4ade80;
+  --color-focus-ring: rgba(56, 189, 248, 0.7);
+  --color-link-hover: #7dd3fc;
+  --color-deep: #080f1f;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --color-bg: #ffffff;
+    --color-surface: #f8fafc;
+    --color-border: #e2e8f0;
+    --color-text-hi: #0f172a;
+    --color-text-body: #475569;
+    --color-muted: #94a3b8;
+    --color-primary: #0284c7;
+    --color-warn: #f59e0b;
+    --color-oops: #f97316;
+    --color-success: #22c55e;
+    --color-focus-ring: rgba(2, 132, 199, 0.7);
+    --color-link-hover: #0369a1;
+    --color-deep: #f0f4f8;
+  }
+}
+
+/* Explicit theme overrides (set by TopBar theme toggle) */
+:root[data-theme='light'] {
+  --color-bg: #ffffff;
+  --color-surface: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-text-hi: #0f172a;
+  --color-text-body: #475569;
+  --color-muted: #94a3b8;
+  --color-primary: #0284c7;
+  --color-warn: #f59e0b;
+  --color-oops: #f97316;
+  --color-success: #22c55e;
+  --color-focus-ring: rgba(2, 132, 199, 0.7);
+  --color-link-hover: #0369a1;
+  --color-deep: #f0f4f8;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-border: #334155;
+  --color-text-hi: #f8fafc;
+  --color-text-body: #94a3b8;
+  --color-muted: #64748b;
+  --color-primary: #38bdf8;
+  --color-warn: #fbbf24;
+  --color-oops: #fb923c;
+  --color-success: #4ade80;
+  --color-focus-ring: rgba(56, 189, 248, 0.7);
+  --color-link-hover: #7dd3fc;
+  --color-deep: #080f1f;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ────────────────────────────────────────────────────────── */
+html {
+  background: var(--color-bg);
+  color: var(--color-text-body);
+  font-family: 'Geist', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* ── Focus ───────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Links ───────────────────────────────────────────────────────── */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/* ── Typography scale ────────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-text-hi);
+  font-weight: 700;
+  line-height: 1.2;
+}
+h1 {
+  font-size: 1.75rem;
+  letter-spacing: -0.025em;
+}
+h2 {
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+h3 {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+/* display size (article heroes) */
+.display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* ── Code ────────────────────────────────────────────────────────── */
+code,
+pre {
+  font-family: 'Geist Mono', monospace;
+  font-size: 0.875rem;
+}
+pre {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  line-height: 1.6;
+}
+:not(pre) > code {
+  background: var(--color-surface);
+  border-radius: 3px;
+  padding: 0.15em 0.35em;
+  font-size: 0.875em;
+}
+
+/* ── Skip link ───────────────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 1rem;
+  background: var(--color-surface);
+  color: var(--color-text-hi);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  z-index: 9999;
+  font-size: 0.875rem;
+}
+.skip-link:focus {
+  left: 1rem;
+}

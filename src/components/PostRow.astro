@@ -1,0 +1,50 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const { title, date, tags } = post.data;
+const formattedDate = date.toLocaleDateString('en-NZ', { month: 'short', year: 'numeric' });
+const meta = [formattedDate, tags[0]].filter(Boolean).join(' · ');
+---
+
+<a href={`/blog/${post.id}/`} class="post-row">
+  <span class="post-row-title">{title}</span>
+  <span class="post-row-meta">{meta}</span>
+</a>
+
+<style>
+  .post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--color-surface);
+    gap: 12px;
+    text-decoration: none;
+  }
+  .post-row:last-child {
+    border-bottom: none;
+  }
+  .post-row:hover {
+    text-decoration: none;
+  }
+
+  .post-row-title {
+    color: var(--color-text-body);
+    font-size: 13px;
+    transition: color 0.12s;
+  }
+  .post-row:hover .post-row-title {
+    color: var(--color-text-hi);
+  }
+
+  .post-row-meta {
+    color: var(--color-muted);
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+</style>

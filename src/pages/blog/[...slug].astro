@@ -1,0 +1,254 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+import SeverityDot from '../../components/SeverityDot.astro';
+import TagBadge from '../../components/TagBadge.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import Comments from '../../components/Comments.astro';
+import SharePost from '../../components/SharePost.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+import { SITE } from '../../config/site';
+
+/** Returns static route parameters and post props for each published blog entry. */
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', (p) => !p.data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { title, date, description, tags, severity, comments = true } = post.data;
+const formattedDate = date.toISOString().slice(0, 10);
+const articleURL = new URL(`/blog/${post.id}/`, Astro.site).href;
+
+// Build tags for SideNav (all posts)
+const allPosts = await getCollection('blog', (p) => !p.data.draft);
+const tagCounts: Record<string, number> = {};
+allPosts.forEach((p) =>
+  p.data.tags.forEach((t) => {
+    tagCounts[t] = (tagCounts[t] ?? 0) + 1;
+  }),
+);
+const allTags = Object.entries(tagCounts)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([tag, count]) => ({ tag, count }));
+
+const { Content, headings } = await render(post);
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description: description,
+  datePublished: date.toISOString(),
+  dateModified: date.toISOString(),
+  author: {
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${SITE.url}/favicon-32x32.png`,
+    },
+  },
+  image: `${SITE.url}/og-image.png`,
+  url: `${SITE.url}/blog/${post.id}/`,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': `${SITE.url}/blog/${post.id}/`,
+  },
+};
+---
+
+<BlogPost {title} {description} ogType="article" tags={allTags} structuredData={articleSchema}>
+  <div class="post-layout">
+    <article class="post-article">
+      <header class="post-header">
+        <div class="post-header-meta">
+          <SeverityDot {severity} />
+          <time datetime={formattedDate} class="post-date">
+            {formattedDate}
+          </time>
+        </div>
+        <h1 class="post-title">{title}</h1>
+        <p class="post-description">{description}</p>
+        {tags.length > 0 && (
+          <nav class="post-tags" aria-label="Post tags">
+            <span class="post-tags-label">Tags</span>
+            {tags.map((tag) => (
+              <TagBadge {tag} />
+            ))}
+          </nav>
+        )}
+      </header>
+      <div class="post-body prose">
+        <Content />
+      </div>
+      <footer class="post-footer">
+        {tags.length > 0 && (
+          <nav class="post-tags" aria-label="Post topics">
+            {tags.map((tag) => (
+              <TagBadge {tag} />
+            ))}
+          </nav>
+        )}
+        <SharePost {title} {description} url={articleURL} />
+      </footer>
+      <RelatedPosts {post} posts={allPosts} />
+      <Comments enabled={comments} />
+    </article>
+    <aside class="post-toc" aria-label="Table of contents">
+      <TableOfContents {headings} />
+    </aside>
+  </div>
+</BlogPost>
+
+<style>
+  .post-layout {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem 1.5rem;
+    width: 100%;
+  }
+
+  .post-article {
+    min-width: 0;
+    max-width: 1210px;
+    flex: 1;
+  }
+
+  .post-header {
+    margin-bottom: 2rem;
+  }
+
+  .post-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .post-tags-label {
+    color: var(--color-text-body);
+    font-size: 0.8125rem;
+    margin-right: 0.25rem;
+  }
+  .post-footer {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .post-footer .post-tags {
+    flex: 1 1 18rem;
+    margin-top: 0;
+    min-height: 44px;
+  }
+
+  .post-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-date {
+    font-size: 0.8125rem;
+    font-family: 'Geist Mono', monospace;
+    color: var(--color-muted);
+  }
+
+  .post-title {
+    font-size: 1.75rem;
+    letter-spacing: -0.025em;
+    color: var(--color-text-hi);
+    margin-bottom: 0.5rem;
+  }
+
+  .post-description {
+    font-size: 1rem;
+    color: var(--color-text-body);
+    line-height: 1.6;
+  }
+
+  .prose :global(h2) {
+    margin: 2rem 0 0.75rem;
+    font-size: 1.25rem;
+    color: var(--color-text-hi);
+  }
+  .prose :global(h3) {
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1.1rem;
+    color: var(--color-text-hi);
+  }
+  .prose :global(p) {
+    margin-bottom: 1rem;
+    color: var(--color-text-body);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 1rem 1.5rem;
+    color: var(--color-text-body);
+    font-size: 14px;
+  }
+  .prose :global(li) {
+    margin-bottom: 0.25rem;
+    line-height: 1.6;
+  }
+  .prose :global(strong) {
+    color: var(--color-text-hi);
+    font-weight: 600;
+  }
+  .prose :global(a) {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .prose :global(a:hover) {
+    text-decoration: underline;
+  }
+  .prose :global(pre) {
+    margin: 1rem 0;
+  }
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--color-border);
+    padding-left: 1rem;
+    color: var(--color-text-body);
+    margin: 1rem 0;
+  }
+
+  /* ToC sidebar */
+  .post-toc {
+    flex-shrink: 0;
+    width: 180px;
+    padding-top: 0.25rem;
+  }
+
+  /* Hide ToC below 1100px */
+  @media (max-width: 1099px) {
+    .post-toc {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .post-layout {
+      padding: 1.25rem 1rem;
+    }
+    .post-title {
+      font-size: 1.375rem;
+    }
+  }
+</style>

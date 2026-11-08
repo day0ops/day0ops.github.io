@@ -1,0 +1,100 @@
+---
+import Base from './Base.astro';
+import SideNav from '../components/SideNav.astro';
+import TopBar from '../components/TopBar.astro';
+import Footer from '../components/Footer.astro';
+import SearchModal from '../components/SearchModal.astro';
+import { getCollection } from 'astro:content';
+
+interface Props {
+  title: string;
+  description: string;
+  ogType?: 'website' | 'article';
+  tags?: Array<{ tag: string; count: number }>;
+  structuredData?: Record<string, unknown>;
+}
+
+const { title, description, ogType = 'website', tags = [], structuredData } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const allPosts = (await getCollection('blog', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const searchPosts = allPosts.map((p) => ({
+  title: p.data.title,
+  href: `/blog/${p.id}/`,
+  date: p.data.date.toLocaleDateString('en-NZ', { month: 'short', year: 'numeric' }),
+  tags: p.data.tags ?? [],
+}));
+---
+
+<Base {title} {description} {ogType} {structuredData}>
+  <div class="site-shell">
+    <SideNav {currentPath} {tags} />
+    <div class="content-area" id="content-area">
+      <TopBar />
+      <div class="content-main">
+        <slot />
+      </div>
+      <Footer />
+    </div>
+  </div>
+  <SearchModal posts={searchPosts} />
+</Base>
+
+<style>
+  .site-shell {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Mobile-first: no margin by default */
+  .content-area {
+    margin-left: 0;
+    padding-top: 52px; /* height of mobile-bar */
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Slot content grows to push footer to bottom */
+  .content-main {
+    flex: 1;
+  }
+
+  /* Desktop: add margin for sidebar */
+  @media (min-width: 768px) {
+    .content-area {
+      margin-left: 200px;
+      padding-top: 0;
+      transition: margin-left 0.2s ease;
+    }
+
+    :global(#sidenav.collapsed) ~ .content-area,
+    :global(#sidenav.collapsed) + * .content-area {
+      margin-left: 52px;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var nav = document.getElementById('sidenav');
+    var content = document.getElementById('content-area');
+    if (!nav || !content) return;
+
+    function sync() {
+      if (window.innerWidth <= 767) {
+        content.style.marginLeft = '';
+        return;
+      }
+      content.style.marginLeft = nav.classList.contains('collapsed') ? '52px' : '200px';
+    }
+    sync();
+    window.addEventListener('resize', sync);
+    var observer = new MutationObserver(sync);
+    observer.observe(nav, { attributes: true, attributeFilter: ['class'] });
+  })();
+</script>

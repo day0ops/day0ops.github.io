@@ -1,0 +1,154 @@
+---
+import { SITE } from '../config/site';
+const { ga4Id, adsId } = SITE;
+---
+
+<!-- gtag.js base snippet — loaded async but does NOT fire until consent granted -->
+<script is:inline define:vars={{ ga4Id, adsId }}>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag('js', new Date());
+
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+  });
+
+  var CONSENT_KEY = 'day0ops-analytics-consent';
+
+  function loadGtag() {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4Id;
+    document.head.appendChild(s);
+  }
+
+  function grantConsent() {
+    gtag('consent', 'update', { analytics_storage: 'granted', ad_storage: 'granted' });
+    gtag('config', ga4Id);
+    gtag('config', adsId);
+  }
+
+  var stored = localStorage.getItem(CONSENT_KEY);
+  if (stored === 'granted') {
+    loadGtag();
+    grantConsent();
+  }
+
+  window.__analyticsConsent = { grant: grantConsent, loadGtag: loadGtag };
+</script>
+
+<!-- Cookie banner: visibility set client-side to avoid build-time localStorage access -->
+<!-- Starts hidden; the is:inline script below shows it if no decision has been stored -->
+<div
+  class="cookie-banner"
+  id="cookie-banner"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Cookie consent"
+  style="display: none"
+>
+  <p class="cookie-text">
+    This site uses Google Analytics and Ads to understand traffic. No personal data is sold.
+  </p>
+  <div class="cookie-actions">
+    <button class="cookie-btn cookie-btn--accept" id="cookie-accept">
+      Accept
+    </button>
+    <button class="cookie-btn cookie-btn--decline" id="cookie-decline">
+      Decline
+    </button>
+  </div>
+</div>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    padding: 0.875rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cookie-text {
+    font-size: 0.875rem;
+    color: var(--color-text-body);
+    margin: 0;
+    flex: 1;
+  }
+
+  .cookie-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .cookie-btn {
+    padding: 0.35rem 0.875rem;
+    border-radius: 5px;
+    font-size: 0.8125rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .cookie-btn--accept {
+    background: var(--color-primary);
+    color: var(--color-bg);
+    border-color: var(--color-primary);
+  }
+  .cookie-btn--accept:hover {
+    opacity: 0.85;
+  }
+
+  .cookie-btn--decline {
+    background: transparent;
+    color: var(--color-muted);
+  }
+  .cookie-btn--decline:hover {
+    color: var(--color-text-hi);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var KEY = 'day0ops-analytics-consent';
+    var banner = document.getElementById('cookie-banner');
+    var accept = document.getElementById('cookie-accept');
+    var decline = document.getElementById('cookie-decline');
+
+    if (!banner) return;
+
+    // Show banner only if no decision has been made yet
+    var stored = localStorage.getItem(KEY);
+    if (!stored) banner.style.display = 'flex';
+
+    accept.addEventListener('click', function () {
+      localStorage.setItem(KEY, 'granted');
+      banner.style.display = 'none';
+      if (window.__analyticsConsent) {
+        window.__analyticsConsent.loadGtag();
+        window.__analyticsConsent.grant();
+      }
+    });
+
+    decline.addEventListener('click', function () {
+      localStorage.setItem(KEY, 'denied');
+      banner.style.display = 'none';
+    });
+  })();
+</script>

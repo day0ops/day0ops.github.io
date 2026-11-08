@@ -1,0 +1,556 @@
+---
+// Career timeline as a terminal-style git log
+---
+
+<div class="terminal" aria-label="Career timeline">
+  <div class="titlebar">
+    <div class="traffic">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </div>
+    <div class="wintitle">
+      ~/career &nbsp;·&nbsp; <span class="cmd">git log --graph --stat</span>
+    </div>
+  </div>
+
+  <div class="log-body">
+    <div class="prompt-line">
+      <span class="ps1">❯</span>{' '}
+      <span class="cmd">git log --graph --stat --author="day0ops" --since="20 years ago"</span>
+    </div>
+
+    <!-- Entry 1: Principal Architect -->
+    <div class="log-entry arch">
+      <div class="g-col">
+        <div class="g-node" aria-hidden="true"></div>
+        <div class="g-line" aria-hidden="true"></div>
+      </div>
+      <div aria-hidden="true"></div>
+      <div class="log-content">
+        <div class="log-meta">
+          <span class="log-hash">c4a91f3</span>
+          <span class="log-phase">Architect · Solution Architecture</span>
+          <span class="log-when">~3 years ago → now</span>
+        </div>
+        <div class="log-title">
+          Designing systems before they exist, and living with the consequences
+        </div>
+        <div class="log-body-text">
+          From hands-on operations to shaping the platforms others run on.{' '}
+          <strong>Solution architecture</strong> at this level means you're accountable for
+          decisions that surface as 3am incidents two years later; that's why the ops background
+          matters.
+          <br />
+          The AI infrastructure shift landed right here: designing for a world where{' '}
+          <strong>GPU scheduling, model serving, and agent orchestration</strong> are first-class
+          infrastructure concerns.
+        </div>
+        <div class="log-diff">
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Platform strategy across cloud-native and AI-native stacks</span>
+          </div>
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Solution design for distributed, multi-cluster, multi-tenant systems</span>
+          </div>
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Technical leadership, making trade-offs explicit</span>
+          </div>
+        </div>
+        <div class="log-tags">
+          <span class="log-tag">solution architecture</span>
+          <span class="log-tag">platform engineering</span>
+          <span class="log-tag">service mesh</span>
+          <span class="log-tag">istio</span>
+          <span class="log-tag">AI systems</span>
+          <span class="log-tag">cloud strategy</span>
+          <span class="log-tag">distributed systems</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entry 2: DevOps / SRE -->
+    <div class="log-entry dops">
+      <div class="g-col">
+        <div class="g-node" aria-hidden="true"></div>
+        <div class="g-line" aria-hidden="true"></div>
+      </div>
+      <div aria-hidden="true"></div>
+      <div class="log-content">
+        <div class="log-meta">
+          <span class="log-hash">7f3d2b8</span>
+          <span class="log-phase">DevOps · SRE</span>
+          <span class="log-when">~10 years ago</span>
+        </div>
+        <div class="log-title">Kubernetes, service mesh, and the 3am education</div>
+        <div class="log-body-text">
+          The move from writing software to running it was the most humbling shift in 20 years.{' '}
+          <strong>Kubernetes cluster operations</strong> at scale, <strong>service mesh</strong>{' '}
+          (Istio, Linkerd, the sharp edges of both), and the SRE discipline of treating ops as an
+          engineering problem.
+          <br />
+          Production taught me more about software design than any design review. Every incident
+          became a post-mortem, every post-mortem became a blog post.
+        </div>
+        <div class="log-diff">
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Kubernetes cluster operations; multi-cluster, production at scale</span>
+          </div>
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Service mesh; Istio, Linkerd, mTLS, traffic management, observability</span>
+          </div>
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>SRE practices; error budgets, runbooks, toil reduction, on-call</span>
+          </div>
+        </div>
+        <div class="log-tags">
+          <span class="log-tag">kubernetes</span>
+          <span class="log-tag">istio</span>
+          <span class="log-tag">service mesh</span>
+          <span class="log-tag">SRE</span>
+          <span class="log-tag">observability</span>
+          <span class="log-tag">CI/CD</span>
+          <span class="log-tag">gitops</span>
+          <span class="log-tag">incident response</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entry 3: Java Developer / Software Architect -->
+    <div class="log-entry java">
+      <div class="g-col">
+        <div class="g-node" aria-hidden="true"></div>
+        <div class="g-line" aria-hidden="true"></div>
+      </div>
+      <div aria-hidden="true"></div>
+      <div class="log-content">
+        <div class="log-meta">
+          <span class="log-hash">1a0e5c2</span>
+          <span class="log-phase">Java Developer · Software Architect</span>
+          <span class="log-when">~20 years ago</span>
+        </div>
+        <div class="log-title">
+          Java, enterprise systems, and learning to design software that outlives you
+        </div>
+        <div class="log-body-text">
+          Started where most engineers start, writing code and figuring out why it breaks.{' '}
+          <strong>Java development</strong> through the enterprise era: J2EE, Spring, distributed
+          systems before Kubernetes was a thing.
+          <br />
+          The move into <strong>software architecture</strong> meant owning decisions, not just
+          implementations, and learning that the cost of a bad design compounds with every engineer
+          who has to work around it.
+        </div>
+        <div class="log-diff">
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Java development; Spring, J2EE, enterprise apps</span>
+          </div>
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>Software architecture; system design, API design, technical debt</span>
+          </div>
+          <div class="diff-line">
+            <span class="plus">+</span>
+            <span>CS fundamentals; algorithms, data structures, distributed systems</span>
+          </div>
+        </div>
+        <div class="log-tags">
+          <span class="log-tag">java</span>
+          <span class="log-tag">spring</span>
+          <span class="log-tag">software architecture</span>
+          <span class="log-tag">system design</span>
+          <span class="log-tag">distributed systems</span>
+          <span class="log-tag">API design</span>
+          <span class="log-tag">open source</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cursor-line" aria-hidden="true">
+      <span class="ps1">❯</span> <span class="cursor"></span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .terminal {
+    background: var(--color-deep, #080f1f);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    overflow: hidden;
+    font-family: 'Geist Mono', monospace;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  }
+  .titlebar {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 11px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .traffic {
+    display: flex;
+    gap: 7px;
+  }
+  .traffic span {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+  .traffic span:nth-child(1) {
+    background: #ff5f57;
+  }
+  .traffic span:nth-child(2) {
+    background: #ffbd2e;
+  }
+  .traffic span:nth-child(3) {
+    background: #28c840;
+  }
+  .wintitle {
+    font-size: 11px;
+    color: var(--color-muted);
+    margin-left: 6px;
+    letter-spacing: 0.01em;
+  }
+  .wintitle .cmd {
+    color: var(--color-text-body);
+  }
+
+  .log-body {
+    padding: 24px 24px 28px;
+  }
+  .prompt-line {
+    font-size: 11px;
+    color: var(--color-muted);
+    margin-bottom: 20px;
+    animation: fade-in 0.3s ease both;
+  }
+  .prompt-line .ps1 {
+    color: var(--color-primary);
+  }
+  .prompt-line .cmd {
+    color: var(--color-text-hi);
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .log-entry {
+    display: grid;
+    grid-template-columns: 18px 2px 1fr;
+    gap: 0 18px;
+    animation: entry-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .log-entry:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .log-entry:nth-child(3) {
+    animation-delay: 0.55s;
+  }
+  .log-entry:nth-child(4) {
+    animation-delay: 0.95s;
+  }
+  @keyframes entry-in {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .g-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3px;
+  }
+  .g-node {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid var(--color-deep, #080f1f);
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+  }
+  .g-line {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+  }
+
+  .arch .g-node {
+    background: var(--color-oops);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.7);
+  }
+  .dops .g-node {
+    background: var(--color-primary);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+  }
+  .java .g-node {
+    background: var(--color-warn);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+  }
+
+  .g-node::after {
+    content: '';
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .arch .g-node::after {
+    border: 1.5px solid var(--color-oops);
+    animation: node-pulse 2.6s ease 0.15s infinite;
+  }
+  .dops .g-node::after {
+    border: 1.5px solid var(--color-primary);
+    animation: node-pulse 2.6s ease 0.55s infinite;
+  }
+  .java .g-node::after {
+    border: 1.5px solid var(--color-warn);
+    animation: node-pulse 2.6s ease 0.95s infinite;
+  }
+  @keyframes node-pulse {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.4);
+    }
+    25% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1.4);
+    }
+  }
+
+  .g-line {
+    clip-path: inset(0 0 100% 0);
+  }
+  .log-entry:nth-child(2) .g-line {
+    animation: line-draw 0.6s ease 0.35s forwards;
+  }
+  .log-entry:nth-child(3) .g-line {
+    animation: line-draw 0.6s ease 0.75s forwards;
+  }
+  .log-entry:nth-child(4) .g-line {
+    display: none;
+  }
+  @keyframes line-draw {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0% 0);
+    }
+  }
+
+  .arch .g-line {
+    background: linear-gradient(to bottom, var(--color-oops), var(--color-primary));
+  }
+  .dops .g-line {
+    background: linear-gradient(to bottom, var(--color-primary), var(--color-warn));
+  }
+
+  .log-content {
+    padding: 0 0 28px;
+  }
+  .log-entry:last-of-type .log-content {
+    padding-bottom: 0;
+  }
+
+  .log-meta {
+    font-size: 10px;
+    color: var(--color-muted);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .log-hash {
+    font-family: 'Geist Mono', monospace;
+  }
+  .arch .log-hash {
+    color: var(--color-oops);
+  }
+  .dops .log-hash {
+    color: var(--color-primary);
+  }
+  .java .log-hash {
+    color: var(--color-warn);
+  }
+  .log-phase {
+    font-weight: 700;
+    font-family: 'Geist', sans-serif;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 1px 7px;
+    border-radius: 3px;
+  }
+  .arch .log-phase {
+    color: var(--color-oops);
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px solid rgba(249, 115, 22, 0.25);
+  }
+  .dops .log-phase {
+    color: var(--color-primary);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+  }
+  .java .log-phase {
+    color: var(--color-warn);
+    background: rgba(251, 191, 36, 0.12);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+  }
+  .log-when {
+    font-size: 10px;
+    color: var(--color-border);
+  }
+
+  .log-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-hi);
+    font-family: 'Geist', sans-serif;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .log-body-text {
+    font-size: 12px;
+    color: var(--color-text-body);
+    font-family: 'Geist', sans-serif;
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
+  .log-body-text strong {
+    color: var(--color-text-hi);
+    font-weight: 600;
+  }
+
+  .log-diff {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 12px;
+  }
+  .diff-line {
+    font-size: 11px;
+    font-family: 'Geist Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: flex;
+    gap: 8px;
+    width: fit-content;
+  }
+  .diff-line .plus {
+    flex-shrink: 0;
+  }
+  .arch .diff-line {
+    background: rgba(249, 115, 22, 0.06);
+    color: var(--color-text-body);
+  }
+  .arch .diff-line .plus {
+    color: var(--color-oops);
+  }
+  .dops .diff-line {
+    background: rgba(56, 189, 248, 0.06);
+    color: var(--color-text-body);
+  }
+  .dops .diff-line .plus {
+    color: var(--color-primary);
+  }
+  .java .diff-line {
+    background: rgba(251, 191, 36, 0.06);
+    color: var(--color-text-body);
+  }
+  .java .diff-line .plus {
+    color: var(--color-warn);
+  }
+
+  .log-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .log-tag {
+    font-size: 10px;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 1px 7px;
+    font-family: 'Geist Mono', monospace;
+  }
+
+  .cursor-line {
+    font-size: 11px;
+    color: var(--color-muted);
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cursor-line .ps1 {
+    color: var(--color-muted);
+  }
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--color-primary);
+    opacity: 0.8;
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .terminal {
+      border-radius: 10px;
+    }
+    .log-body {
+      padding: 16px 14px 20px;
+    }
+    .log-entry {
+      grid-template-columns: 14px 0 1fr;
+      gap: 0 12px;
+    }
+    .log-title {
+      font-size: 13px;
+    }
+    .log-body-text {
+      font-size: 11px;
+    }
+  }
+</style>

@@ -1,0 +1,637 @@
+---
+import CascadeMark from './CascadeMark.astro';
+
+interface Props {
+  currentPath: string;
+  tags?: Array<{ tag: string; count: number }>;
+}
+
+const { currentPath, tags = [] } = Astro.props;
+
+const navLinks = [
+  {
+    href: '/',
+    label: 'Home',
+    icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z"/></svg>',
+  },
+  {
+    href: '/about/',
+    label: 'About',
+    icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.029 10 8 10c-2.029 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/></svg>',
+  },
+];
+
+const categoryLinks = [
+  {
+    href: '/categories/cloud-native/',
+    label: 'Cloud Native',
+    color: 'primary',
+    icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2z"/></svg>',
+  },
+  {
+    href: '/categories/ai-engineering/',
+    label: 'AI Engineering',
+    color: 'oops',
+    icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.396-.129c-.01 0-.1.01-.1.1v.996a.25.25 0 0 0 .25.25l3.5-.001a.25.25 0 0 0 .25-.25V8.2c0-.09-.09-.1-.1-.1a24.77 24.77 0 0 1-1.396.129l-.92-.9a.25.25 0 0 0-.18-.068h-.01Z"/><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z"/></svg>',
+  },
+  {
+    href: '/categories/software-engineering/',
+    label: 'Software Engineering',
+    color: 'warn',
+    icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/></svg>',
+  },
+  {
+    href: '/categories/tinkering/',
+    label: 'Tinkering',
+    color: 'success',
+    icon: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1 0L0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z"/></svg>',
+  },
+];
+---
+
+<!-- Mobile top bar (visible < 768px) -->
+<div class="mobile-bar" role="banner">
+  <a href="/" class="wordmark" aria-label="day0ops home">
+    <CascadeMark size={24} />
+    <span class="wordmark-text">
+      <span class="day0">day0</span>
+      <span class="ops">ops</span>
+    </span>
+  </a>
+  <button
+    class="hamburger"
+    id="nav-hamburger"
+    aria-label="Open navigation"
+    aria-expanded="false"
+    aria-controls="sidenav"
+  >
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path
+        fill-rule="evenodd"
+        d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
+      />
+    </svg>
+  </button>
+</div>
+
+<!-- Mobile drawer backdrop -->
+<div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+
+<!-- Desktop sidebar + mobile drawer (shared) -->
+<nav class="sidenav" id="sidenav" aria-label="Site navigation">
+  <!-- Mark + wordmark (desktop only) -->
+  <a href="/" class="sidenav-brand" aria-label="day0ops home">
+    <CascadeMark size={28} />
+    <span class="sidenav-wordmark">
+      <span class="day0">day0</span>
+      <span class="ops">ops</span>
+    </span>
+  </a>
+
+  <!-- Nav links -->
+  <ul class="sidenav-links" role="list">
+    {navLinks.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          class={`sidenav-link${currentPath === link.href ? ' sidenav-link--active' : ''}`}
+          aria-current={currentPath === link.href ? 'page' : undefined}
+        >
+          <span class="sidenav-icon" aria-hidden="true" set:html={link.icon} />
+          <span class="sidenav-label">{link.label}</span>
+        </a>
+      </li>
+    ))}
+
+    <!-- Tags (collapsible) -->
+    {tags.length > 0 && (
+      <li class="sidenav-tags-item">
+        <button
+          class="sidenav-link sidenav-tags-toggle"
+          id="tags-toggle"
+          aria-expanded="false"
+          aria-controls="tags-list"
+        >
+          <span class="sidenav-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+            </svg>
+          </span>
+          <span class="sidenav-label">Tags</span>
+          <span class="sidenav-chevron" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+              />
+            </svg>
+          </span>
+        </button>
+        <ul class="tags-list" id="tags-list" role="list" hidden>
+          {tags.map(({ tag, count }) => (
+            <li>
+              <a
+                href={`/tags/${tag}/`}
+                class={`tags-list-link${currentPath === `/tags/${tag}/` ? ' tags-list-link--active' : ''}`}
+                aria-current={currentPath === `/tags/${tag}/` ? 'page' : undefined}
+              >
+                <span class="tag-name">{tag}</span>
+                <span class="tag-count">{count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </li>
+    )}
+
+    <li>
+      <a href="/rss.xml" class="sidenav-link" aria-label="RSS feed">
+        <span class="sidenav-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2zm0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2zm.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+          </svg>
+        </span>
+        <span class="sidenav-label">RSS</span>
+      </a>
+    </li>
+
+    <!-- Divider -->
+    <li class="sidenav-divider" aria-hidden="true"></li>
+
+    <!-- Categories -->
+    <li class="sidenav-section-label">
+      <span class="sidenav-label">Categories</span>
+    </li>
+    {categoryLinks.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          class={`sidenav-link sidenav-link--category sidenav-link--${link.color}${currentPath.startsWith(link.href) ? ' sidenav-link--active' : ''}`}
+          aria-current={currentPath.startsWith(link.href) ? 'page' : undefined}
+        >
+          <span class="sidenav-icon" aria-hidden="true" set:html={link.icon} />
+          <span class="sidenav-label">{link.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div class="sidenav-powered" aria-hidden="true">
+    <span class="powered-label">Powered by</span>
+    <div class="powered-tags">
+      <span class="powered-tag">Astro</span>
+      <span class="powered-tag">Cloudflare</span>
+      <span class="powered-tag">GitHub</span>
+    </div>
+  </div>
+
+  <!-- Collapse toggle (desktop only) -->
+  <button class="sidenav-collapse" id="sidenav-collapse" aria-label="Collapse navigation">
+    <span class="collapse-icon" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path
+          fill-rule="evenodd"
+          d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+        />
+      </svg>
+    </span>
+    <span class="sidenav-label collapse-label">Collapse</span>
+  </button>
+</nav>
+
+<!-- Mobile drawer close button inside drawer -->
+<button class="drawer-close" id="drawer-close" aria-label="Close navigation" hidden>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+  </svg>
+</button>
+
+<style>
+  /* ── Mobile bar ────────────────────────────────────────── */
+  .mobile-bar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    z-index: 100;
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    color: var(--color-text-body);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  /* ── Drawer backdrop ───────────────────────────────────── */
+  .drawer-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 199;
+  }
+  .drawer-backdrop.open {
+    display: block;
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────── */
+  .sidenav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 200px;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0.5rem;
+    gap: 0.25rem;
+    z-index: 200;
+    overflow-y: auto;
+    transition: width 0.2s ease;
+  }
+
+  /* Collapsed state */
+  .sidenav.collapsed {
+    width: 52px;
+  }
+  .sidenav.collapsed .sidenav-label,
+  .sidenav.collapsed .sidenav-wordmark,
+  .sidenav.collapsed .tags-list,
+  .sidenav.collapsed .collapse-label {
+    display: none;
+  }
+  .sidenav.collapsed .sidenav-chevron {
+    display: none;
+  }
+  .sidenav.collapsed .sidenav-collapse {
+    justify-content: center;
+  }
+  .sidenav.collapsed .collapse-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Brand / wordmark */
+  .sidenav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+  }
+
+  .sidenav-wordmark {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+  }
+  .day0 {
+    color: var(--color-text-hi);
+  }
+  .ops {
+    color: var(--color-oops);
+  }
+
+  /* Links */
+  .sidenav-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    flex: 1;
+  }
+
+  .sidenav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 5px;
+    color: var(--color-text-body);
+    font-size: 0.875rem;
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+  .sidenav-link:hover {
+    background: var(--color-bg);
+    color: var(--color-text-hi);
+  }
+  .sidenav-link--active {
+    background: var(--color-bg);
+    color: var(--color-primary);
+  }
+
+  /* Section label */
+  .sidenav-section-label {
+    padding: 0.75rem 0.5rem 0.25rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    opacity: 0.7;
+  }
+  .sidenav.collapsed .sidenav-section-label {
+    display: none;
+  }
+
+  /* Divider */
+  .sidenav-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0.5rem 0.5rem;
+    opacity: 0.5;
+  }
+  .sidenav.collapsed .sidenav-divider {
+    margin: 0.5rem 0.25rem;
+  }
+
+  /* Category links with colors */
+  .sidenav-link--category.sidenav-link--primary:hover,
+  .sidenav-link--category.sidenav-link--primary.sidenav-link--active {
+    color: var(--color-primary);
+  }
+  .sidenav-link--category.sidenav-link--oops:hover,
+  .sidenav-link--category.sidenav-link--oops.sidenav-link--active {
+    color: var(--color-oops);
+  }
+  .sidenav-link--category.sidenav-link--warn:hover,
+  .sidenav-link--category.sidenav-link--warn.sidenav-link--active {
+    color: var(--color-warn);
+  }
+  .sidenav-link--category.sidenav-link--success:hover,
+  .sidenav-link--category.sidenav-link--success.sidenav-link--active {
+    color: var(--color-success);
+  }
+
+  .sidenav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .sidenav-chevron {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+  }
+  .sidenav-tags-toggle[aria-expanded='true'] .sidenav-chevron {
+    transform: rotate(90deg);
+  }
+
+  /* Tags sub-list */
+  .tags-list {
+    list-style: none;
+    padding-left: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-top: 0.125rem;
+  }
+  .tags-list[hidden] {
+    display: none;
+  }
+
+  .tags-list-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    color: var(--color-text-body);
+    font-size: 0.8125rem;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .tags-list-link:hover {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .tags-list-link--active {
+    color: var(--color-primary);
+  }
+  .tag-count {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+
+  /* Collapse toggle */
+  .sidenav-collapse {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0;
+    padding: 0.4rem 0.5rem;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.75rem;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    cursor: pointer;
+    width: 100%;
+    transition: color 0.15s;
+  }
+  .sidenav-collapse:hover {
+    color: var(--color-text-hi);
+  }
+  .collapse-icon {
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  /* Powered-by strip */
+  .sidenav-powered {
+    margin-top: auto;
+    padding: 10px 0.5rem 12px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .sidenav.collapsed .sidenav-powered {
+    display: none;
+  }
+  .powered-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    opacity: 0.55;
+  }
+  .powered-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .powered-tag {
+    font-size: 9px;
+    font-family: 'Geist Mono', monospace;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 1px 6px;
+    background: var(--color-bg);
+  }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 767px) {
+    .mobile-bar {
+      display: flex;
+    }
+    .sidenav {
+      display: none;
+    }
+    .sidenav.drawer-open {
+      display: flex;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 80vw;
+      max-width: 280px;
+      z-index: 200;
+      animation: drawer-slide-in 0.25s ease;
+    }
+    @keyframes drawer-slide-in {
+      from {
+        transform: translateX(-100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+    .sidenav-brand {
+      display: flex;
+    }
+    .sidenav-collapse {
+      display: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var KEY = 'day0ops-nav-collapsed';
+    var nav = document.getElementById('sidenav');
+    var collapseBtn = document.getElementById('sidenav-collapse');
+    var hamburger = document.getElementById('nav-hamburger');
+    var backdrop = document.getElementById('drawer-backdrop');
+    var drawerClose = document.getElementById('drawer-close');
+    var tagsToggle = document.getElementById('tags-toggle');
+    var tagsList = document.getElementById('tags-list');
+
+    // ── Desktop collapse ────────────────────────────────
+    function setCollapsed(collapsed) {
+      nav.classList.toggle('collapsed', collapsed);
+      if (collapseBtn) {
+        collapseBtn.setAttribute(
+          'aria-label',
+          collapsed ? 'Expand navigation' : 'Collapse navigation',
+        );
+      }
+      localStorage.setItem(KEY, collapsed ? '1' : '0');
+    }
+
+    if (collapseBtn) {
+      if (localStorage.getItem(KEY) === '1') setCollapsed(true);
+      collapseBtn.addEventListener('click', function () {
+        setCollapsed(!nav.classList.contains('collapsed'));
+      });
+    }
+
+    // ── Mobile drawer ───────────────────────────────────
+    function getFocusable() {
+      return Array.from(
+        nav.querySelectorAll(
+          'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+    }
+    function trapFocus(e) {
+      var els = getFocusable();
+      if (!els.length) return;
+      var first = els[0],
+        last = els[els.length - 1];
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+    function openDrawer() {
+      nav.classList.add('drawer-open');
+      backdrop.classList.add('open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      hamburger.setAttribute('aria-label', 'Close navigation');
+      if (drawerClose) drawerClose.hidden = false;
+      var firstEl = getFocusable()[0];
+      if (firstEl) firstEl.focus();
+      nav.addEventListener('keydown', trapFocus);
+    }
+    function closeDrawer() {
+      nav.classList.remove('drawer-open');
+      backdrop.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.setAttribute('aria-label', 'Open navigation');
+      if (drawerClose) drawerClose.hidden = true;
+      nav.removeEventListener('keydown', trapFocus);
+      hamburger.focus();
+    }
+
+    if (hamburger) {
+      hamburger.addEventListener('click', function () {
+        nav.classList.contains('drawer-open') ? closeDrawer() : openDrawer();
+      });
+    }
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    // Close drawer when a nav link is tapped (mobile)
+    nav.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        if (nav.classList.contains('drawer-open')) closeDrawer();
+      });
+    });
+
+    // ── Tags toggle ─────────────────────────────────────
+    if (tagsToggle && tagsList) {
+      tagsToggle.addEventListener('click', function () {
+        var expanded = tagsToggle.getAttribute('aria-expanded') === 'true';
+        tagsToggle.setAttribute('aria-expanded', String(!expanded));
+        tagsList.hidden = expanded;
+      });
+    }
+  })();
+</script>

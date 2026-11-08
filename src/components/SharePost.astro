@@ -1,0 +1,177 @@
+---
+/** Sharing controls for an article's public URL, title, and summary. */
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+}
+
+const { title, description, url } = Astro.props;
+const xURL = `https://twitter.com/intent/tweet?${new URLSearchParams({ text: title, url })}`;
+const linkedInURL = `https://www.linkedin.com/sharing/share-offsite/?${new URLSearchParams({ url })}`;
+const emailURL = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${description}\n\n${url}`)}`;
+---
+
+<section class="post-share" aria-label="Share this post" data-share-post data-url={url}>
+  <div class="share-actions">
+    <a
+      href={xURL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Share this post on X"
+      title="Share on X"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+      </svg>
+    </a>
+    <a
+      href={linkedInURL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Share this post on LinkedIn"
+      title="Share on LinkedIn"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 9v11M10 20V9m0 5a4 4 0 0 1 8 0v6" />
+        <circle cx="4" cy="4" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    </a>
+    <a href={emailURL} aria-label="Share this post by email" title="Share by email">
+      <svg
+        width="19"
+        height="19"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </svg>
+    </a>
+    <button
+      type="button"
+      data-copy-link
+      aria-label="Copy link to this post"
+      title="Copy link"
+      hidden
+    >
+      <svg
+        width="19"
+        height="19"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        aria-hidden="true"
+      >
+        <rect x="8" y="8" width="12" height="12" rx="2" />
+        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+      </svg>
+    </button>
+  </div>
+  <p class="share-status" role="status" aria-live="polite"></p>
+  <input
+    class="share-url"
+    type="text"
+    value={url}
+    readonly
+    aria-label="Article link to copy"
+    hidden
+  />
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-share-post]').forEach((section) => {
+    const button = section.querySelector<HTMLButtonElement>('[data-copy-link]');
+    const status = section.querySelector<HTMLElement>('[role="status"]');
+    const input = section.querySelector<HTMLInputElement>('.share-url');
+    const url = section.dataset.url;
+    if (!button || !status || !input || !url) return;
+
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        status.textContent = 'Link copied.';
+        input.hidden = true;
+      } catch {
+        status.textContent = 'Select and copy the link below.';
+        input.hidden = false;
+        input.focus();
+        input.select();
+      }
+    });
+  });
+</script>
+
+<style>
+  .post-share {
+    margin-left: auto;
+    min-width: 0;
+    max-width: 100%;
+    text-align: right;
+  }
+  .share-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.125rem;
+  }
+  .share-actions a,
+  .share-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .share-actions [hidden] {
+    display: none;
+  }
+  .share-actions a:hover,
+  .share-actions button:hover {
+    color: var(--color-primary);
+  }
+  .share-status {
+    font-size: 0.8125rem;
+    color: var(--color-text-body);
+  }
+  .share-status:not(:empty) {
+    margin-top: 0.5rem;
+  }
+  .share-url {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.625rem;
+    background: var(--color-bg);
+    color: var(--color-text-hi);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font: inherit;
+    font-size: 0.8125rem;
+  }
+</style>

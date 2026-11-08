@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@700&family=Geist+Mono:wght@400&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #0f172a;
+        position: relative;
+      }
+      /* Logo mark: 120×120, centred horizontally, top edge at y=190px */
+      .mark {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        top: 190px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      /* Wordmark: Geist 700 48px, top of bounding box at y=350px */
+      .wordmark {
+        position: absolute;
+        top: 350px;
+        left: 0;
+        width: 1200px;
+        text-align: center;
+        font-family: 'Geist', sans-serif;
+        font-weight: 700;
+        font-size: 48px;
+        line-height: 1;
+        /* Display-scale tracking per spec (intentional override of wordmark default -0.025em) */
+        letter-spacing: -0.03em;
+      }
+      .day0 {
+        color: #f8fafc;
+      }
+      .ops {
+        color: #fb923c;
+      }
+      /* Tagline: Geist Mono 400 18px, top of bounding box at y=422px */
+      .tagline {
+        position: absolute;
+        top: 422px;
+        left: 0;
+        width: 1200px;
+        text-align: center;
+        font-family: 'Geist Mono', monospace;
+        font-weight: 400;
+        font-size: 18px;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mark"><!-- MARK --></div>
+    <div class="wordmark"><span class="day0">day0</span><span class="ops">ops</span></div>
+    <div class="tagline">// the oops is part of the job</div>
+  </body>
+</html>

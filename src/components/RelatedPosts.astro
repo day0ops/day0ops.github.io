@@ -1,0 +1,104 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+/** Shows up to three published articles related to post, using recent posts when no tags match. */
+interface Props {
+  post: CollectionEntry<'blog'>;
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { post, posts } = Astro.props;
+const tags = new Set(post.data.tags.map((tag) => tag.toLowerCase()));
+const candidates = posts
+  .filter((candidate) => candidate.id !== post.id && !candidate.data.draft)
+  .map((candidate) => ({
+    post: candidate,
+    score: new Set(
+      candidate.data.tags.map((tag) => tag.toLowerCase()).filter((tag) => tags.has(tag)),
+    ).size,
+  }))
+  .sort(
+    (a, b) =>
+      b.score - a.score ||
+      b.post.data.date.valueOf() - a.post.data.date.valueOf() ||
+      a.post.id.localeCompare(b.post.id),
+  );
+const matches = candidates.filter((candidate) => candidate.score > 0);
+const recommendations = (matches.length ? matches : candidates).slice(0, 3);
+const heading = matches.length ? 'Related posts' : 'More from the blog';
+---
+
+{recommendations.length > 0 && (
+  <section class="related-posts" aria-label={heading}>
+    <h2>{heading}</h2>
+    <div class="related-list">
+      {recommendations.map(({ post: related }) => (
+        <a class="related-post" href={`/blog/${related.id}/`}>
+          <time datetime={related.data.date.toISOString()}>
+            {related.data.date.toLocaleDateString('en-NZ', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+              timeZone: 'UTC',
+            })}
+          </time>
+          <h3>{related.data.title}</h3>
+          <p>{related.data.description}</p>
+          <span class="read-post">
+            Read post <span aria-hidden="true">↗</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    margin-top: 3rem;
+  }
+  .related-posts h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .related-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 1rem;
+  }
+  .related-post {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+  .related-post:hover {
+    border-color: var(--color-primary);
+    text-decoration: none;
+  }
+  .related-post time {
+    color: var(--color-muted);
+    font-size: 0.75rem;
+  }
+  .related-post h3 {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .related-post p {
+    color: var(--color-text-body);
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+  .read-post {
+    color: var(--color-primary);
+    font-size: 0.8125rem;
+    margin-top: auto;
+    padding-top: 0.375rem;
+  }
+</style>

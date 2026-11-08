@@ -1,0 +1,112 @@
+---
+interface Column {
+  key: string;
+  label: string;
+}
+interface Props {
+  columns: Column[];
+  data: Record<string, string>[];
+}
+const { columns, data } = Astro.props;
+const tableId = `ft-${Math.random().toString(36).slice(2, 7)}`;
+---
+
+<div class="filterable-table" data-table-id={tableId}>
+  <input
+    class="ft-filter"
+    type="text"
+    placeholder="Filter…"
+    aria-label="Filter table rows"
+    autocomplete="off"
+  />
+  <div class="ft-wrapper">
+    <table id={tableId}>
+      <thead>
+        <tr>
+          {columns.map((col) => (
+            <th>{col.label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row) => (
+          <tr>
+            {columns.map((col) => (
+              <td>{row[col.key] ?? ''}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .filterable-table {
+    margin: 1.5rem 0;
+  }
+
+  .ft-filter {
+    width: 100%;
+    max-width: 320px;
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 0.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text-hi);
+    font-size: 0.875rem;
+    font-family: inherit;
+  }
+  .ft-filter:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+
+  .ft-wrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+  th {
+    color: var(--color-text-hi);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  td {
+    color: var(--color-text-body);
+  }
+  tr:hover td {
+    background: var(--color-surface);
+  }
+  tr[hidden] {
+    display: none;
+  }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.filterable-table').forEach((container) => {
+    const input = container.querySelector('.ft-filter');
+    const rows = container.querySelectorAll('tbody tr');
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      rows.forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.hidden = q !== '' && !text.includes(q);
+      });
+    });
+  });
+</script>

@@ -1,0 +1,185 @@
+---
+import BlogPost from '../layouts/BlogPost.astro';
+---
+
+<BlogPost title="404" description="Page not found.">
+  <main class="error-main">
+    <div class="error-panel">
+      <div class="sev-badge">
+        <span class="sev-dot" aria-hidden="true"></span>
+        SEV-3 · Page Not Found
+      </div>
+
+      <div class="error-code" aria-label="404">
+        404
+      </div>
+
+      <p class="error-title">You&rsquo;ve found the incident.</p>
+      <p class="error-desc">
+        This page doesn&rsquo;t exist. The dot is already red. No runbook covers this one — your
+        best move is heading back home.
+      </p>
+
+      <div class="curl-block" aria-hidden="true">
+        <div class="curl-line curl-cmd">$ curl -sI https://day0ops.com/this-page</div>
+        <div class="curl-line curl-status">
+          HTTP/2 <span class="curl-404">404</span>
+        </div>
+        <div class="curl-line curl-header">content-type: text/html</div>
+        <div class="curl-line curl-header">
+          x-runbook: <span class="curl-none">none — start from home</span>
+        </div>
+      </div>
+
+      <div class="error-actions">
+        <a href="/" class="btn-primary">
+          Back to home
+        </a>
+        <a href="/" class="btn-ghost">
+          Browse all posts
+        </a>
+      </div>
+    </div>
+  </main>
+</BlogPost>
+
+<style>
+  .error-main {
+    padding: 2rem 1.5rem;
+    min-height: calc(100vh - 4rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .error-panel {
+    max-width: 520px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .sev-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-oops);
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    width: fit-content;
+  }
+  .sev-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-oops);
+    animation: pulse-sev 2s ease-in-out infinite;
+  }
+  @keyframes pulse-sev {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.8);
+    }
+  }
+  .error-code {
+    font-size: clamp(72px, 12vw, 108px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-oops) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .error-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text-hi);
+  }
+  .error-desc {
+    font-size: 0.9375rem;
+    color: var(--color-text-body);
+    line-height: 1.6;
+  }
+  .curl-block {
+    background: var(--color-deep, #080f1f);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .curl-line {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .curl-cmd {
+    color: var(--color-muted);
+  }
+  .curl-status {
+    color: var(--color-text-hi);
+    margin-top: 6px;
+  }
+  .curl-404 {
+    color: var(--color-oops);
+    font-weight: 700;
+  }
+  .curl-header {
+    color: var(--color-muted);
+  }
+  .curl-none {
+    color: var(--color-warn);
+  }
+  .error-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background: var(--color-primary);
+    color: #0f172a;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover {
+    opacity: 0.85;
+    text-decoration: none;
+    color: #0f172a;
+  }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-body);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+</style>

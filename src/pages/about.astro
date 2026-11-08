@@ -1,0 +1,557 @@
+---
+import { getCollection } from 'astro:content';
+import BlogPost from '../layouts/BlogPost.astro';
+import CareerLog from '../components/CareerLog.astro';
+
+const allPosts = await getCollection('blog', (p) => !p.data.draft);
+const tagCounts: Record<string, number> = {};
+allPosts.forEach((p) =>
+  p.data.tags.forEach((t) => {
+    tagCounts[t] = (tagCounts[t] ?? 0) + 1;
+  }),
+);
+const tags = Object.entries(tagCounts)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([tag, count]) => ({ tag, count }));
+---
+
+<BlogPost
+  title="About"
+  description="Kasun 'Kas' Talwatta — Principal Architect, cloud-native systems, and 20 years of distributed infrastructure."
+  {tags}
+>
+  <main class="about-main">
+    <div class="about-content">
+      <!-- Profile hero -->
+      <div class="profile-hero">
+        <div class="profile-avatar-wrap">
+          <img
+            src="https://avatars.githubusercontent.com/u/2648624?s=400&amp;u=14fe05b554e6dfb6d5e0cdc393ce98b281e01059&amp;v=4"
+            alt="Kasun Talwatta"
+            class="profile-avatar"
+          />
+          <span class="profile-status-dot" aria-hidden="true"></span>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">Kasun &ldquo;Kas&rdquo; Talwatta</div>
+          <div class="profile-handle">@day0ops</div>
+          <div class="profile-location">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+            </svg>
+            New Zealand
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="section-header">
+        <span class="section-label">About</span>
+        <div class="section-header-line"></div>
+      </div>
+
+      <div class="about-block">
+        <div class="about-body">
+          <p>
+            Twenty years in software leaves a particular kind of mark. I started as a
+            <strong>full-stack developer</strong>, building across industries that had little in
+            common: fleet and job tracking, health IT, enterprise systems. They all shared the same
+            fundamental challenge though, which was distributed data and the infrastructure
+            underneath it. The parts that fascinated me most were never the features. They were the
+            seams between systems and what happened when those seams failed.
+          </p>
+          <p>
+            That path eventually led to where I am now. I work as a{' '}
+            <strong>Principal Architect</strong>
+            at a cloud-native company, working closely with customers to untangle complex problems
+            and turn them into solutions that actually hold up. A lot of the role is about meeting
+            people where they are: understanding what they're trying to build, what's in the way,
+            and helping them find a path through it. Platform strategy and distributed systems
+            design are still at the core, but the work is as much about people and problems as it is
+            about technology.
+          </p>
+          <p>
+            Open source is less a preference and more a conviction. The best ideas endure because
+            they're visible, testable, and improvable by anyone. I've contributed where I could and
+            learned far more from reading other people's code than from any course or textbook.
+          </p>
+
+          <div class="skills-section">
+            <div class="skill-domain-grid">
+              <div class="skill-domain">
+                <div class="skill-domain-name">Platform &amp; Cloud</div>
+                <div class="skill-tags">
+                  <span class="skill-tag">Kubernetes</span>
+                  <span class="skill-tag">Service Mesh</span>
+                  <span class="skill-tag">Istio</span>
+                  <span class="skill-tag">Cilium</span>
+                  <span class="skill-tag">Platform Engineering</span>
+                  <span class="skill-tag">AWS</span>
+                  <span class="skill-tag">Multi-cluster</span>
+                </div>
+              </div>
+              <div class="skill-domain">
+                <div class="skill-domain-name">Observability</div>
+                <div class="skill-tags">
+                  <span class="skill-tag">Prometheus</span>
+                  <span class="skill-tag">OpenTelemetry</span>
+                  <span class="skill-tag">Distributed Tracing</span>
+                  <span class="skill-tag">eBPF</span>
+                  <span class="skill-tag">Grafana</span>
+                </div>
+              </div>
+              <div class="skill-domain">
+                <div class="skill-domain-name">DevOps &amp; GitOps</div>
+                <div class="skill-tags">
+                  <span class="skill-tag">Argo CD</span>
+                  <span class="skill-tag">Flux</span>
+                  <span class="skill-tag">Terraform</span>
+                  <span class="skill-tag">CI/CD</span>
+                  <span class="skill-tag">SRE</span>
+                </div>
+              </div>
+              <div class="skill-domain">
+                <div class="skill-domain-name">AI Infrastructure</div>
+                <div class="skill-tags">
+                  <span class="skill-tag">LLMs</span>
+                  <span class="skill-tag">Agentic Systems</span>
+                  <span class="skill-tag">MLOps</span>
+                  <span class="skill-tag">GPU Infrastructure</span>
+                  <span class="skill-tag">RAG</span>
+                  <span class="skill-tag">Vector Databases</span>
+                </div>
+              </div>
+              <div class="skill-domain">
+                <div class="skill-domain-name">Architecture</div>
+                <div class="skill-tags">
+                  <span class="skill-tag">Solution Architecture</span>
+                  <span class="skill-tag">Distributed Systems</span>
+                  <span class="skill-tag">API Design</span>
+                  <span class="skill-tag">System Design</span>
+                  <span class="skill-tag">Cloud Native</span>
+                </div>
+              </div>
+            </div>
+            <div class="skill-roots">
+              <div class="skill-roots-label">Where it started</div>
+              <div class="skill-roots-note">
+                The languages from the early years. Still close to the metal, still something I
+                genuinely enjoy.
+              </div>
+              <div class="skill-tags">
+                <span class="skill-tag root">Java</span>
+                <span class="skill-tag root">C++</span>
+                <span class="skill-tag root">C</span>
+                <span class="skill-tag root">Python</span>
+                <span class="skill-tag root">Shell</span>
+                <span class="skill-tag root">Perl</span>
+                <span class="skill-tag root">Ruby</span>
+              </div>
+            </div>
+          </div>
+
+          <p>
+            Outside of terminals and architecture diagrams, I tinker with
+            <strong>electronics and robotics</strong>. Hardware debugging has a different kind of
+            satisfaction. There is no stack trace, but the smoke tells you everything.
+          </p>
+
+          <p class="name-intro">
+            The name <strong>day0ops</strong> has three readings:
+          </p>
+          <div class="name-breakdown">
+            <div class="name-row">
+              <span class="name-key">day zero ops</span>
+              <span class="name-val">
+                Foundational infrastructure work. The stuff that has to be right before anything
+                else can run.
+              </span>
+            </div>
+            <div class="name-row">
+              <span class="name-key">zero-day mindset</span>
+              <span class="name-val">
+                Security-aware thinking baked in from the start, not bolted on after the breach.
+              </span>
+            </div>
+            <div class="name-row">
+              <span class="name-key">day0-oops</span>
+              <span class="name-val">
+                <em>Because things break.</em> That's where the learning is. The orange dot is
+                always on fire. That's not a bug.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connect -->
+      <div class="section-header">
+        <span class="section-label">Connect</span>
+        <div class="section-header-line"></div>
+      </div>
+      <div class="qr-section">
+        <div class="qr-card">
+          <div class="qr-img-wrap">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=0f172a&bgcolor=ffffff&data=https://github.com/day0ops"
+              alt="QR code for github.com/day0ops"
+              width="120"
+              height="120"
+              loading="lazy"
+            />
+          </div>
+          <div class="qr-info">
+            <div class="qr-platform">GitHub</div>
+            <a href="https://github.com/day0ops" class="qr-url" target="_blank" rel="noopener">
+              github.com/day0ops
+            </a>
+          </div>
+        </div>
+        <div class="qr-card">
+          <div class="qr-img-wrap">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=0f172a&bgcolor=ffffff&data=https://x.com/day0ops"
+              alt="QR code for x.com/day0ops"
+              width="120"
+              height="120"
+              loading="lazy"
+            />
+          </div>
+          <div class="qr-info">
+            <div class="qr-platform">X / Twitter</div>
+            <a href="https://x.com/day0ops" class="qr-url" target="_blank" rel="noopener">
+              x.com/day0ops
+            </a>
+          </div>
+        </div>
+        <div class="qr-card">
+          <div class="qr-img-wrap">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&color=0f172a&bgcolor=ffffff&data=mailto%3Akasun.talwatta%40gmail.com"
+              alt="QR code for email contact"
+              width="120"
+              height="120"
+              loading="lazy"
+            />
+          </div>
+          <div class="qr-info">
+            <div class="qr-platform">Email</div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden="true"
+              style="color: var(--color-muted); margin-top: 4px"
+            >
+              <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Career -->
+      <div class="section-header">
+        <span class="section-label">Career</span>
+        <div class="section-header-line"></div>
+      </div>
+      <CareerLog />
+    </div>
+  </main>
+</BlogPost>
+
+<style>
+  .about-main {
+    padding: 28px 28px 40px;
+  }
+  .about-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Profile hero */
+  .profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .profile-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 52% 18%;
+    border: 2px solid var(--color-border);
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+    display: block;
+  }
+  .profile-status-dot {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2px solid var(--color-surface);
+  }
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .profile-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-hi);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .profile-handle {
+    font-size: 12px;
+    color: var(--color-primary);
+    font-family: 'Geist Mono', monospace;
+  }
+  .profile-location {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+  .section-header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    opacity: 0.4;
+  }
+
+  /* About bio */
+  .about-block {
+    margin-bottom: 28px;
+  }
+  .about-body > p {
+    font-size: 14px;
+    color: var(--color-text-body);
+    line-height: 1.75;
+    margin-bottom: 14px;
+  }
+  .about-body strong {
+    color: var(--color-text-hi);
+    font-weight: 600;
+  }
+
+  /* Skills */
+  .skills-section {
+    margin: 20px 0;
+  }
+  .skill-domain-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .skill-domain {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 13px 15px;
+    min-width: 200px;
+    max-width: 320px;
+    flex: 1 1 280px;
+  }
+  .skill-domain-name {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    margin-bottom: 9px;
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .skill-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-body);
+  }
+  .skill-tag.root {
+    color: var(--color-oops);
+    border-color: rgba(249, 115, 22, 0.3);
+    background: rgba(249, 115, 22, 0.05);
+  }
+  .skill-roots {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 13px 15px;
+    border-left: 3px solid rgba(56, 189, 248, 0.4);
+    max-width: 660px;
+  }
+  .skill-roots-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+  }
+  .skill-roots-note {
+    font-size: 11px;
+    color: var(--color-muted);
+    margin-bottom: 9px;
+    line-height: 1.5;
+  }
+
+  /* Name breakdown */
+  .name-intro {
+    margin-top: 20px !important;
+    font-size: 12px !important;
+    color: var(--color-muted) !important;
+  }
+  .name-intro strong {
+    color: var(--color-text-body) !important;
+    font-weight: 600 !important;
+  }
+  .name-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 14px 0 0;
+    padding: 14px 18px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    max-width: 660px;
+  }
+  .name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .name-key {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: var(--color-oops);
+    white-space: nowrap;
+    min-width: 110px;
+  }
+  .name-val {
+    color: var(--color-text-body);
+    line-height: 1.5;
+    font-size: 12px;
+  }
+  .name-val em {
+    color: var(--color-primary);
+    font-style: normal;
+  }
+
+  /* QR codes */
+  .qr-section {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .qr-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 160px;
+    flex-shrink: 0;
+  }
+  .qr-img-wrap {
+    background: #fff;
+    border-radius: 6px;
+    padding: 6px;
+  }
+  .qr-img-wrap img {
+    display: block;
+  }
+  .qr-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .qr-platform {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-hi);
+  }
+  .qr-url {
+    font-size: 10px;
+    font-family: 'Geist Mono', monospace;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  .qr-url:hover {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 767px) {
+    .about-main {
+      padding: 1.25rem 1rem 2rem;
+    }
+    .profile-hero {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+    }
+    .profile-name {
+      font-size: 20px;
+    }
+    .skill-domain {
+      min-width: 0;
+    }
+    .name-row {
+      flex-direction: column;
+      gap: 4px;
+    }
+    .name-breakdown {
+      padding: 12px 14px;
+    }
+    .qr-card {
+      width: 140px;
+      padding: 12px;
+    }
+  }
+</style>

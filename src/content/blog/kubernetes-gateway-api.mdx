@@ -1,0 +1,343 @@
+---
+title: 'Kubernetes Gateway API: The Standard That Finally Makes Sense'
+date: 2026-03-25
+description: "The Ingress API is frozen. Gateway API is its successor. Here's the history, the architecture, and why you should adopt it now."
+tags: [kubernetes, networking, gateway-api, ingress]
+severity: primary
+---
+
+## The Ingress era is over
+
+The Kubernetes Ingress API is frozen. No new features, no enhancements, just security fixes until eventual deprecation. This happened quietly in Kubernetes 1.19 back in 2020, but the implications are only now becoming unavoidable: if you're still building on Ingress, you're building on a dead-end.
+
+Gateway API is the designated successor. It reached general availability in November 2023, and the project has shipped four major releases since. This is not another vendor's networking CRD competing for attention. It's an official Kubernetes SIG Network initiative, developed by the same community that maintains Kubernetes networking itself. The project has been called "the most collaborative API in Kubernetes history," with hundreds of contributors from dozens of companies shaping its design.
+
+If you're evaluating how to handle traffic routing in Kubernetes today, this is where you should start.
+
+## Why Ingress is holding you back
+
+The Ingress API did its job for years. It provided a standard way to expose HTTP services to external traffic. But the limitations have compounded, and the workarounds have become the norm.
+
+**The annotation problem.** Every Ingress controller has its own custom annotations for features beyond basic path routing. Timeouts, retries, header manipulation, rate limiting—all configured through implementation-specific annotations. What works on NGINX Ingress Controller doesn't work on Traefik. What works on Traefik doesn't work on HAProxy. You're not writing portable configuration. You're writing configuration for your specific controller, and the Ingress resource is just the carrier.
+
+**The lowest common denominator trap.** The original Ingress design required every feature to be universally implementable across all controllers. This strangled the API's evolution. You can't add native canary routing or traffic splitting because not every controller architecture supports it. Innovation happened outside the spec—in annotations, in vendor CRDs, in anything but the Ingress resource itself. The standard became a baseline that nobody extended.
+
+**The single-resource problem.** Ingress combines two distinct concerns into one resource: infrastructure configuration (which load balancer, what ports, what TLS certificates) and routing rules (which paths go to which services). In multi-team clusters, this creates permission conflicts that don't map to organizational boundaries. Application developers need to modify routing for their services but shouldn't be changing infrastructure configuration. Cluster operators need to manage TLS certificates and listener configuration but shouldn't be touching application-specific paths. One resource, one permission model, no clean separation.
+
+**The fragmentation evidence.** The ecosystem responded to Ingress limitations by building alternatives. Istio created VirtualService and Gateway. Contour created HTTPProxy. Ambassador created Mapping. Traefik created IngressRoute. Each solved real problems that Ingress couldn't address, but now you have five different ways to configure routing depending on which tool you picked. There's no portability between them, no shared ecosystem, no convergence. Skills don't transfer. Tooling doesn't interoperate. The community's collective learning is scattered across incompatible APIs.
+
+This is the state Gateway API was designed to fix.
+
+## What Gateway API actually is
+
+Gateway API is a collection of Kubernetes custom resources that provide a role-oriented, expressive, and portable way to configure traffic routing. The key insight is a separation of concerns that Ingress never made: infrastructure provisioning, traffic policy, and routing rules are different responsibilities that belong to different people.
+
+### The three personas
+
+Gateway API's resource model maps directly to three organizational roles.
+
+**Infrastructure providers** define GatewayClass resources. A GatewayClass describes a type of gateway infrastructure available in the cluster—the underlying load balancer technology, the controller that manages it, any shared configuration. This is the cloud provider saying "we offer Application Load Balancers" or the platform team saying "we run Envoy-based gateways." GatewayClass is typically defined once per cluster or per infrastructure type, not per application.
+
+**Cluster operators** define Gateway resources. A Gateway is a specific instance of traffic-handling infrastructure: which ports to listen on, what protocols to accept, what TLS certificates to use, which namespaces are allowed to attach routing rules. This is the platform team provisioning shared infrastructure and controlling who can use it.
+
+**Application developers** define Route resources. An HTTPRoute specifies how HTTP traffic should be routed to their services: path matching, header-based routing, traffic weighting, redirects, rewrites. The team that owns the workload controls how traffic reaches it, without needing access to infrastructure configuration.
+
+### Why this separation matters
+
+The role-oriented model aligns with how organizations actually work—and with how Kubernetes RBAC is designed.
+
+You can grant application teams permission to create HTTPRoute resources in their namespaces without giving them access to Gateway or GatewayClass resources. Developers can ship routing changes for their services without infrastructure team involvement. Infrastructure changes don't require coordinating with every application team that uses the gateway. Each layer has clear ownership, clear boundaries, and can evolve on its own schedule.
+
+This isn't just organizational convenience. It's a security model. A compromised application namespace can modify routing for its own services but cannot reconfigure the gateway's TLS certificates, change which ports are exposed, or affect routing for other namespaces. The blast radius of a permissions mistake is bounded by the resource type.
+
+### The portability promise
+
+Gateway API eliminates the annotation problem by making features first-class API fields. Traffic weighting for canary deployments, header-based routing, request redirects, URL rewrites, timeouts, retries—these are all part of the spec, not implementation-specific extensions.
+
+The API defines three support levels:
+
+- **Core** features must be implemented by every conformant controller. If you use only core features, your configuration works everywhere.
+- **Extended** features are portable across implementations that support them. The spec defines the behavior; implementations opt in. If you use an extended feature on a conformant controller that supports it, the behavior is identical to any other conformant controller that supports it.
+- **Implementation-specific** features are explicitly marked as non-portable. You know what you're giving up when you use them.
+
+This is a real portability guarantee backed by conformance tests, not a marketing claim. Implementations prove conformance by passing the test suite, and the results are public.
+
+## The core API resources
+
+The Gateway API resource model has three primary resources that form an interdependent hierarchy. Understanding how they connect is essential to using the API effectively.
+
+### GatewayClass
+
+A GatewayClass defines a type of gateway controller available in the cluster. It's the template that describes what kind of infrastructure will handle traffic for Gateways that reference it.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: example-gateway-class
+spec:
+  controllerName: example.com/gateway-controller
+```
+
+The `controllerName` field identifies which controller will reconcile Gateways that use this class. Each controller watches for Gateways referencing its GatewayClass and provisions the appropriate infrastructure.
+
+GatewayClass is typically created by infrastructure providers or platform teams, not by application developers. Most clusters have one or a small number of GatewayClasses available.
+
+### Gateway
+
+A Gateway is an instance of traffic-handling infrastructure. It references a GatewayClass and defines the specifics: what ports to listen on, what protocols to accept, what TLS certificates to use, and which namespaces can attach routes.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: production-gateway
+  namespace: gateway-infra
+spec:
+  gatewayClassName: example-gateway-class
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: '*.example.com'
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-example-com
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              gateway-access: 'true'
+```
+
+The `listeners` array defines the entry points. Each listener specifies a protocol, port, and optional hostname. For HTTPS listeners, TLS configuration references Kubernetes Secrets containing certificates.
+
+The `allowedRoutes` field controls which namespaces can attach routes to this listener. Options include `Same` (only the Gateway's namespace), `All` (any namespace), or `Selector` (namespaces matching a label selector). This is the access control mechanism that lets platform teams provision shared infrastructure while controlling who can use it.
+
+### HTTPRoute
+
+An HTTPRoute defines how HTTP traffic matching certain criteria should be routed to backend services. It attaches to one or more Gateways and specifies matching rules and destinations.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: app-routes
+  namespace: my-app
+spec:
+  parentRefs:
+    - name: production-gateway
+      namespace: gateway-infra
+  hostnames:
+    - 'app.example.com'
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      backendRefs:
+        - name: api-service
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: frontend-service
+          port: 3000
+```
+
+The `parentRefs` field attaches this route to a Gateway. The Gateway must allow routes from this namespace, or the attachment will fail. `hostnames` filters which requests this route applies to. `rules` define the actual routing logic: match conditions and backend destinations.
+
+Traffic weighting for canary deployments is a first-class feature, not an annotation:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: canary-rollout
+  namespace: my-app
+spec:
+  parentRefs:
+    - name: production-gateway
+      namespace: gateway-infra
+  hostnames:
+    - 'app.example.com'
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: app-stable
+          port: 8080
+          weight: 90
+        - name: app-canary
+          port: 8080
+          weight: 10
+```
+
+No annotations. No controller-specific syntax. This works on any conformant implementation.
+
+### GRPCRoute
+
+GRPCRoute provides gRPC-specific routing with method-level matching. It reached GA alongside HTTPRoute and handles gRPC's unique requirements natively:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpc-routes
+  namespace: my-app
+spec:
+  parentRefs:
+    - name: production-gateway
+      namespace: gateway-infra
+  rules:
+    - matches:
+        - method:
+            service: myapp.UserService
+            method: GetUser
+      backendRefs:
+        - name: user-service
+          port: 50051
+```
+
+### The resource hierarchy
+
+The relationship between resources flows in one direction:
+
+![Gateway API Resource Hierarchy: GatewayClass defines the controller, Gateway creates infrastructure instances, Routes attach to Gateways and direct traffic to Services](/blog/gateway-api-hierarchy.png)
+
+**GatewayClass** defines what controllers exist. **Gateway** creates instances of infrastructure, referencing a GatewayClass and controlling route attachment. **Routes** (HTTPRoute, GRPCRoute, etc.) attach to Gateways and direct traffic to **Services**.
+
+### Standard vs. Experimental resources
+
+Gateway API uses release channels to balance stability with innovation:
+
+| Channel           | Resources                                                                     | Status                           |
+| ----------------- | ----------------------------------------------------------------------------- | -------------------------------- |
+| **Standard (GA)** | GatewayClass, Gateway, HTTPRoute, GRPCRoute, ReferenceGrant, BackendTLSPolicy | Production-ready, stable API     |
+| **Experimental**  | TCPRoute, UDPRoute, TLSRoute, BackendLBPolicy                                 | API may change, use with caution |
+
+Standard channel resources have full conformance test coverage and stability guarantees. Experimental resources are functional but may see breaking changes before graduation.
+
+## The unification story
+
+Gateway API started as "Ingress v2"—a better way to handle north-south traffic from external clients to services inside the cluster. It could have stopped there. Instead, the project expanded to address a parallel fragmentation problem: service mesh configuration.
+
+### The GAMMA initiative
+
+In 2022, representatives from the service mesh community—Istio, Linkerd, Kuma—recognized an opportunity. Service mesh had the same problem Ingress had: every mesh defined its own custom resources for traffic policy. Istio used VirtualService and DestinationRule. Linkerd used ServiceProfile. What worked on one mesh didn't transfer to another.
+
+The Gateway API for Mesh Management and Administration (GAMMA) initiative asked a simple question: what if the same API that handles ingress could also handle mesh traffic? HTTPRoute already expressed routing semantics. The resource model already separated concerns appropriately. Why build a different abstraction for east-west traffic?
+
+### How it works for mesh
+
+For service mesh use cases, Routes attach directly to Service resources instead of Gateways:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: service-routing
+  namespace: my-app
+spec:
+  parentRefs:
+    - kind: Service
+      name: my-service
+  rules:
+    - matches:
+        - headers:
+            - name: x-canary
+              value: 'true'
+      backendRefs:
+        - name: my-service-canary
+          port: 8080
+    - backendRefs:
+        - name: my-service-stable
+          port: 8080
+```
+
+No Gateway resource needed for internal traffic. The Service itself becomes the attachment point. Same HTTPRoute spec, same matching semantics, different attachment target.
+
+This means you learn one API and use it everywhere. Routing rules for external traffic and internal traffic use identical syntax. Platform teams can standardize on Gateway API whether they're doing ingress-only, mesh-only, or both.
+
+### Current status
+
+GAMMA reached the Standard channel (GA) in Gateway API v1.1, released in May 2024. This is not experimental mesh support—it's the production-ready, community-endorsed way to configure service mesh routing using Gateway API.
+
+Conformant service mesh implementations include Istio (1.16+), Linkerd (2.14+), and Kuma (2.3+). Google Cloud Service Mesh implements GAMMA for GKE. The ecosystem has converged.
+
+## How we got here
+
+Gateway API didn't emerge fully formed. Understanding its evolution explains why the design looks the way it does and why you can trust its stability.
+
+### The origin (2019)
+
+At KubeCon San Diego in 2019, Bowei Du from Google presented a proposal that would eventually become Gateway API. The working title was "Ingress v2," and the motivation was clear: the Ingress API was designed for the lowest common denominator. Every feature had to be universally implementable, which meant the spec couldn't express anything sophisticated. The result was fragmentation—every controller extended Ingress with annotations and alternative CRDs, and nothing was portable.
+
+Du's proposal introduced the role-oriented resource model: separate resources for infrastructure definition, infrastructure instances, and routing rules, each aligned with different organizational roles. This separation of concerns became Gateway API's defining characteristic.
+
+### Collaborative design (2020-2022)
+
+Unlike most Kubernetes APIs, Gateway API developed outside the core Kubernetes repository as Custom Resource Definitions. This enabled faster iteration and broader participation. The project wasn't constrained by Kubernetes release cycles, and contributions didn't require navigating the full Kubernetes contributor process.
+
+Gateway Enhancement Proposals (GEPs) structured the design process, similar to Kubernetes Enhancement Proposals but scoped to Gateway API. Each significant feature went through a proposal, review, and approval process before implementation. Over 30 GEPs have been merged, documenting the rationale behind every major design decision.
+
+Hundreds of contributors from dozens of companies shaped the API. Cloud providers (Google, AWS, Microsoft), infrastructure vendors (F5, Kong, Traefik Labs), service mesh projects (Istio, Linkerd), and independent contributors all participated. The project earned the label "the most collaborative API in Kubernetes history."
+
+### Release channels (2021)
+
+The project introduced Experimental and Standard release channels to balance innovation with stability. Features could iterate rapidly in the Experimental channel without stability guarantees, then graduate to Standard once the design stabilized and conformance tests were in place.
+
+This solved a tension that plagued Ingress: the spec couldn't evolve because any change risked breaking existing implementations, but the lack of evolution drove users to non-standard alternatives. Gateway API's channel model let the spec move forward while giving users clear signals about what was production-ready.
+
+### General availability (November 2023)
+
+Gateway API v1.0 shipped with GatewayClass, Gateway, HTTPRoute, and GRPCRoute all in the Standard channel. Over 20 implementations were conformant at launch, including offerings from every major cloud provider and most major ingress controller projects.
+
+### Since GA
+
+The project has maintained a rapid release cadence:
+
+- **v1.1 (May 2024)**: GAMMA (service mesh support) graduated to Standard
+- **v1.2 (October 2024)**: Infrastructure labels for Gateway-generated resources, session persistence, timeouts
+- **v1.3 (June 2025)**: Request mirroring, CORS configuration, gateway merging, retry budgets
+- **v1.4 (October 2025)**: BackendTLSPolicy graduated to Standard, enabling gateway-to-backend TLS configuration
+
+Four major releases in two years, each adding meaningful capabilities while maintaining backward compatibility. The project has clear governance, active maintainers, and sustained momentum. This is not a stalled initiative or a vendor land-grab.
+
+## The verdict
+
+If you're running Ingress today, start planning your migration to Gateway API. If you're starting a new cluster, use Gateway API from day one.
+
+The Ingress API is frozen. It will receive security fixes, but no new features. The annotation-based extensibility model that emerged to fill its gaps created the fragmentation problem Gateway API was built to solve. Continuing to build on Ingress means continuing to accumulate technical debt in an API the community has moved past.
+
+Gateway API offers a better model:
+
+- **Role-oriented design** that aligns with how organizations actually operate and how Kubernetes RBAC actually works
+- **Portable configuration** backed by conformance tests, not marketing claims
+- **First-class features** for traffic weighting, header routing, timeouts, and retries—no annotations required
+- **Unified API** for both ingress and service mesh, so you learn it once and use it everywhere
+- **Active development** with four major releases since GA and clear project governance
+
+The migration path exists. The [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway) tool helps convert existing Ingress resources to Gateway API equivalents. Twenty-five conformant implementations cover every major platform. The ecosystem has moved.
+
+If your existing Ingress setup is stable and you're not experiencing active pain, there's no emergency. But even then, new projects in that cluster should use Gateway API. The learning investment pays off immediately for ingress, and again when you're ready for service mesh.
+
+The Ingress era served its purpose. Gateway API is what comes next.
+
+Start here.
+
+## Resources
+
+- [Gateway API Documentation](https://gateway-api.sigs.k8s.io/) – official docs, concepts, and API reference
+- [Getting Started Guide](https://gateway-api.sigs.k8s.io/guides/getting-started/) – step-by-step setup instructions
+- [Implementation List](https://gateway-api.sigs.k8s.io/implementations/) – conformant controllers and their supported features
+- [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway) – migration tool for converting Ingress resources
+- [GAMMA Documentation](https://gateway-api.sigs.k8s.io/mesh/) – service mesh support and configuration
+- [Migrating from Ingress](https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress/) – detailed migration guidance

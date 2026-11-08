@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Tile background -->
+  <rect width="64" height="64" rx="13" fill="#1e293b"/>
+  <!-- Pulse rings: static, drawn behind incident dot (data-role used by generation script) -->
+  <!-- Inner ring first (per spec table order), outer ring second; both fill=none so z-order has no visual effect -->
+  <circle data-role="pulse-ring" cx="48" cy="16" r="10" fill="none" stroke="#fb923c" stroke-width="1.5" opacity="0.35"/>
+  <circle data-role="pulse-ring" cx="48" cy="16" r="13" fill="none" stroke="#fb923c" stroke-width="1" opacity="0.15"/>
+  <!-- Blue dots (healthy) — opacities decrease toward bottom-left -->
+  <circle cx="16" cy="16" r="5.5" fill="#38bdf8" opacity="0.65"/>
+  <circle cx="16" cy="32" r="5.5" fill="#38bdf8" opacity="0.55"/>
+  <circle cx="32" cy="32" r="5.5" fill="#38bdf8" opacity="0.55"/>
+  <circle cx="16" cy="48" r="5.5" fill="#38bdf8" opacity="0.45"/>
+  <circle cx="32" cy="48" r="5.5" fill="#38bdf8" opacity="0.45"/>
+  <circle cx="48" cy="48" r="5.5" fill="#38bdf8" opacity="0.45"/>
+  <!-- Amber dots (degraded / blast radius) -->
+  <circle cx="32" cy="16" r="5.5" fill="#fbbf24" opacity="0.9"/>
+  <circle cx="48" cy="32" r="5.5" fill="#fbbf24" opacity="0.9"/>
+  <!-- Incident dot (critical, top-right) -->
+  <circle cx="48" cy="16" r="5.5" fill="#fb923c" opacity="1"/>
+</svg>

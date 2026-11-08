@@ -1,0 +1,99 @@
+---
+interface Props {
+  enabled?: boolean;
+}
+
+const { enabled = true } = Astro.props;
+---
+
+{enabled && (
+  <section class="comments-section" aria-label="Comments">
+    <h2 class="comments-heading">Comments</h2>
+    <div class="giscus-container">
+      <script
+        is:inline
+        src="https://giscus.app/client.js"
+        data-repo="day0ops/day0ops.github.io-blog-comments"
+        data-repo-id="R_kgDORvyMWQ"
+        data-category="Comments"
+        data-category-id="DIC_kwDORvyMWc4C5MQ2"
+        data-mapping="pathname"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="dark"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async
+      ></script>
+    </div>
+  </section>
+)}
+
+<style>
+  .comments-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .comments-heading {
+    font-size: 1.25rem;
+    color: var(--color-text-hi);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .giscus-container {
+    min-height: 150px;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var THEME_KEY = 'day0ops-theme';
+
+    function getTheme() {
+      var htmlTheme = document.documentElement.getAttribute('data-theme');
+      if (htmlTheme) return htmlTheme;
+      var saved = localStorage.getItem(THEME_KEY);
+      if (saved) return saved;
+      return 'dark';
+    }
+
+    function updateGiscusTheme(theme) {
+      var iframe = document.querySelector('iframe.giscus-frame');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(
+          { giscus: { setConfig: { theme: theme } } },
+          'https://giscus.app',
+        );
+      }
+    }
+
+    // Set initial theme on Giscus script element before it loads
+    var script = document.querySelector('script[src*="giscus.app"]');
+    if (script) {
+      script.setAttribute('data-theme', getTheme());
+    }
+
+    // Watch for theme changes on <html>
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.attributeName === 'data-theme') {
+          var newTheme = document.documentElement.getAttribute('data-theme');
+          if (newTheme) {
+            updateGiscusTheme(newTheme);
+          }
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  })();
+</script>

@@ -1,0 +1,118 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const { title, description, tags, severity } = post.data;
+const badgeParts = [severity, tags[0]].filter(Boolean);
+const badgeText = badgeParts.join(' · ');
+---
+
+<div class="featured-card">
+  <a href={`/blog/${post.id}/`} class="featured-link" aria-label={`Read: ${title}`}></a>
+  <div class="featured-badge">
+    <span class="dot" aria-hidden="true"></span>
+    {badgeText}
+  </div>
+  <div class="featured-title">{title}</div>
+  <div class="featured-desc">{description}</div>
+  <div class="post-tags">
+    {tags.map((tag) => (
+      <a href={`/tags/${tag}/`} class="post-tag">
+        {tag}
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .featured-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left-color: var(--color-oops);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .featured-link {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+  }
+  .featured-card:hover,
+  .featured-card:focus-within {
+    border-color: var(--color-oops);
+  }
+  .featured-badge,
+  .featured-title,
+  .featured-desc,
+  .post-tags {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .post-tag {
+    pointer-events: auto;
+  }
+
+  .featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    margin-bottom: 8px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-oops);
+    flex-shrink: 0;
+  }
+  .featured-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text-hi);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .featured-desc {
+    font-size: 12px;
+    color: var(--color-muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .post-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .post-tag {
+    font-size: 10px;
+    color: var(--color-muted);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 2px 7px;
+    text-decoration: none;
+    transition:
+      color 0.12s,
+      border-color 0.12s;
+  }
+  .post-tag:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    text-decoration: none;
+  }
+</style>

@@ -1,0 +1,658 @@
+---
+import { getCollection } from 'astro:content';
+import BlogPost from '../layouts/BlogPost.astro';
+import PostCard from '../components/PostCard.astro';
+import PostRow from '../components/PostRow.astro';
+import { SITE } from '../config/site';
+
+const allPosts = (await getCollection('blog', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const [featured, ...rest] = allPosts;
+
+// Build tag list for SideNav
+const tagCounts: Record<string, number> = {};
+allPosts.forEach((p) =>
+  p.data.tags.forEach((t) => {
+    tagCounts[t] = (tagCounts[t] ?? 0) + 1;
+  }),
+);
+const tags = Object.entries(tagCounts)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([tag, count]) => ({ tag, count }));
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+};
+---
+
+<BlogPost
+  title="day0ops"
+  description="Cloud networking, AI, Linux, and the things that go wrong."
+  {tags}
+  structuredData={websiteSchema}
+>
+  <main class="home-main">
+    <div class="home-content">
+      <p class="section-label">Explore by topic</p>
+      <div class="topics-grid">
+        <div class="t-card infra">
+          <a
+            href="/categories/cloud-native/"
+            class="t-card-link"
+            tabindex="-1"
+            aria-hidden="true"
+            aria-label="View Cloud Native posts"
+          ></a>
+          <div class="t-header">
+            <div class="t-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2z" />
+              </svg>
+            </div>
+            <div>
+              <div class="t-title">Cloud Native</div>
+              <div class="t-subtitle">Platform · Cloud · Networking</div>
+            </div>
+          </div>
+          <div class="t-desc">
+            Running distributed systems at scale — the stuff that breaks at 3am, the config you
+            misread, and the runbook you forgot to write.
+          </div>
+          <div class="t-bullets">
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Kubernetes &amp; containers</strong> — cluster ops, scheduling, storage and
+                the edge cases
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Networking &amp; service mesh</strong> — Istio, Cilium, BGP, eBPF and how
+                traffic actually flows
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Observability</strong> — metrics, tracing, logging and systems you can
+                actually debug
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>GitOps &amp; IaC</strong> — Argo CD, Flux, Terraform and making drift a
+                first-class concern
+              </span>
+            </div>
+          </div>
+          <div class="t-tags">
+            <a href="/tags/kubernetes/" class="t-tag">
+              kubernetes
+            </a>
+            <a href="/tags/istio/" class="t-tag">
+              istio
+            </a>
+            <a href="/tags/cilium/" class="t-tag">
+              cilium
+            </a>
+            <a href="/tags/observability/" class="t-tag">
+              observability
+            </a>
+            <a href="/tags/gitops/" class="t-tag">
+              gitops
+            </a>
+          </div>
+        </div>
+
+        <div class="t-card ai">
+          <a
+            href="/categories/ai-engineering/"
+            class="t-card-link"
+            tabindex="-1"
+            aria-hidden="true"
+            aria-label="View AI Engineering posts"
+          ></a>
+          <div class="t-header">
+            <div class="t-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.396-.129c-.01 0-.1.01-.1.1v.996a.25.25 0 0 0 .25.25l3.5-.001a.25.25 0 0 0 .25-.25V8.2c0-.09-.09-.1-.1-.1a24.77 24.77 0 0 1-1.396.129l-.92-.9a.25.25 0 0 0-.18-.068h-.01Z" />
+                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z" />
+              </svg>
+            </div>
+            <div>
+              <div class="t-title">AI Engineering</div>
+              <div class="t-subtitle">LLMs · Agents · MLOps</div>
+            </div>
+          </div>
+          <div class="t-desc">
+            The infrastructure shift is real and it&rsquo;s breaking assumptions we spent a decade
+            building. What it takes to run models in production without destroying your GPU budget.
+          </div>
+          <div class="t-bullets">
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>LLMs in production</strong> — model serving, latency, cost and the prompt
+                engineering rabbit holes
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Agentic systems</strong> — multi-agent orchestration, tool use, evaluation
+                and failure modes
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>MLOps &amp; model pipelines</strong> — Kubeflow, Ray, training infra and the
+                ops side of ML
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>GPU infrastructure</strong> — CUDA, ROCm, scheduling and the hardware layer
+                under the hype
+              </span>
+            </div>
+          </div>
+          <div class="t-tags">
+            <a href="/tags/ai/" class="t-tag">
+              llms
+            </a>
+            <a href="/tags/ai/" class="t-tag">
+              agents
+            </a>
+            <a href="/tags/ai/" class="t-tag">
+              mlops
+            </a>
+            <a href="/tags/ai/" class="t-tag">
+              gpu infra
+            </a>
+            <a href="/tags/ai/" class="t-tag">
+              rag
+            </a>
+          </div>
+        </div>
+
+        <div class="t-card eng">
+          <a
+            href="/categories/software-engineering/"
+            class="t-card-link"
+            tabindex="-1"
+            aria-hidden="true"
+            aria-label="View Software Engineering posts"
+          ></a>
+          <div class="t-header">
+            <div class="t-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z" />
+              </svg>
+            </div>
+            <div>
+              <div class="t-title">Software Engineering</div>
+              <div class="t-subtitle">CS · DevOps · Open Source</div>
+            </div>
+          </div>
+          <div class="t-desc">
+            The craft underneath the tools — computer science fundamentals that still matter, DevOps
+            practices that actually reduce toil, and honest takes on open source.
+          </div>
+          <div class="t-bullets">
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Computer science</strong> — algorithms, data structures, systems design and
+                when they bite you
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>DevOps &amp; SRE</strong> — reliability engineering, incident response, toil
+                reduction and on-call culture
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Open source</strong> — contributing, maintaining, the politics and the
+                genuine value
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Software design</strong> — architecture patterns, API design and making the
+                right trade-offs
+              </span>
+            </div>
+          </div>
+          <div class="t-tags">
+            <a href="/tags/software-engineering/" class="t-tag">
+              devops
+            </a>
+            <a href="/tags/software-engineering/" class="t-tag">
+              sre
+            </a>
+            <a href="/tags/software-engineering/" class="t-tag">
+              open source
+            </a>
+            <a href="/tags/software-engineering/" class="t-tag">
+              architecture
+            </a>
+            <a href="/tags/software-engineering/" class="t-tag">
+              linux
+            </a>
+          </div>
+        </div>
+
+        <div class="t-card tinker">
+          <a
+            href="/categories/tinkering/"
+            class="t-card-link"
+            tabindex="-1"
+            aria-hidden="true"
+            aria-label="View Tinkering posts"
+          ></a>
+          <div class="t-header">
+            <div class="t-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M1 0L0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z" />
+              </svg>
+            </div>
+            <div>
+              <div class="t-title">Tinkering</div>
+              <div class="t-subtitle">Homelab · Lab Notes · Side Projects</div>
+            </div>
+          </div>
+          <div class="t-desc">
+            The stuff that happens off the clock — homelab experiments, weekend projects, and the
+            random rabbit holes that teach you more than any course ever could.
+          </div>
+          <div class="t-bullets">
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Homelab</strong> — self-hosted services, hardware experiments and network
+                setups
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Side projects</strong> — weekend builds, prototypes and things that may
+                never ship
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Automation</strong> — scripts, bots and making the computer do the boring
+                stuff
+              </span>
+            </div>
+            <div class="t-bullet">
+              <span class="t-bdot"></span>
+              <span>
+                <strong>Random deep dives</strong> — the tangents that turn into obsessions
+              </span>
+            </div>
+          </div>
+          <div class="t-tags">
+            <a href="/tags/homelab/" class="t-tag">
+              homelab
+            </a>
+            <a href="/tags/automation/" class="t-tag">
+              automation
+            </a>
+            <a href="/tags/raspberry-pi/" class="t-tag">
+              raspberry-pi
+            </a>
+            <a href="/tags/self-hosted/" class="t-tag">
+              self-hosted
+            </a>
+            <a href="/tags/diy/" class="t-tag">
+              diy
+            </a>
+          </div>
+        </div>
+      </div>
+      {featured && (
+        <>
+          <div class="section-header">
+            <span class="section-label" style="margin:0">
+              Featured
+            </span>
+            <div class="section-header-line"></div>
+          </div>
+          <PostCard post={featured} />
+        </>
+      )}
+      {rest.length > 0 && (
+        <>
+          <div class="section-header">
+            <span class="section-label" style="margin:0">
+              All posts
+            </span>
+            <div class="section-header-line"></div>
+          </div>
+          <div class="post-list">
+            {rest.map((post) => (
+              <PostRow post={post} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  </main>
+</BlogPost>
+
+<style>
+  .home-main {
+    padding: 2rem 1.5rem;
+  }
+
+  .home-content {
+    width: 100%;
+  }
+
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    margin-bottom: 10px;
+  }
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .t-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top-color: var(--card-accent);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s;
+    animation: card-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+  }
+  .t-card:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .t-card:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .t-card:nth-child(3) {
+    animation-delay: 0.25s;
+  }
+  .t-card:nth-child(4) {
+    animation-delay: 0.35s;
+  }
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .t-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+  }
+  .t-card.infra {
+    --card-accent: var(--color-primary);
+  }
+  .t-card.ai {
+    --card-accent: var(--color-oops);
+  }
+  .t-card.eng {
+    --card-accent: var(--color-warn);
+  }
+  .t-card.tinker {
+    --card-accent: var(--color-success);
+  }
+  .t-card:hover,
+  .t-card:focus-within {
+    border-color: var(--card-accent);
+  }
+  .t-header,
+  .t-desc,
+  .t-bullets,
+  .t-tags {
+    pointer-events: none;
+  }
+  .t-tag {
+    pointer-events: auto;
+  }
+  .t-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .t-desc {
+    font-size: 12px;
+    color: var(--color-text-body);
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+  .t-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .t-card.infra .t-icon {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: var(--color-primary);
+  }
+  .t-card.ai .t-icon {
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    color: var(--color-oops);
+  }
+  .t-card.eng .t-icon {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    color: var(--color-warn);
+  }
+  .t-card.tinker .t-icon {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    color: var(--color-success);
+  }
+  .t-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-hi);
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .t-subtitle {
+    font-size: 10px;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .t-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+    z-index: 1;
+  }
+  .t-bullet {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--color-text-body);
+  }
+  .t-bullet strong {
+    color: var(--color-text-hi);
+    font-weight: 600;
+  }
+  .t-bdot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .t-card.infra .t-bdot {
+    background: var(--color-primary);
+  }
+  .t-card.ai .t-bdot {
+    background: var(--color-oops);
+  }
+  .t-card.eng .t-bdot {
+    background: var(--color-warn);
+  }
+  .t-card.tinker .t-bdot {
+    background: var(--color-success);
+  }
+  .t-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .t-tag {
+    font-size: 10px;
+    border-radius: 3px;
+    padding: 2px 7px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    text-decoration: none;
+    transition:
+      border-color 0.12s,
+      color 0.12s;
+  }
+  .t-card.infra .t-tag {
+    color: var(--color-primary);
+  }
+  .t-card.ai .t-tag {
+    color: var(--color-oops);
+  }
+  .t-card.eng .t-tag {
+    color: var(--color-warn);
+  }
+  .t-card.tinker .t-tag {
+    color: var(--color-success);
+  }
+  .t-tag:hover {
+    border-color: currentColor;
+    text-decoration: none;
+  }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    margin-top: 28px;
+  }
+  .section-header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+    opacity: 0.4;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .t-card {
+      animation: none;
+      opacity: 1;
+      transition: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .topics-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .home-main {
+      padding: 1.25rem 1rem;
+    }
+    .t-card {
+      padding: 16px;
+      gap: 12px;
+    }
+    .t-icon {
+      width: 36px;
+      height: 36px;
+    }
+    .t-title {
+      font-size: 13px;
+    }
+    .t-desc {
+      font-size: 11px;
+    }
+    .t-bullet {
+      font-size: 10px;
+    }
+    .t-tag {
+      font-size: 9px;
+      padding: 2px 6px;
+    }
+  }
+</style>

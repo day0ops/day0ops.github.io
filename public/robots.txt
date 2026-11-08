@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://day0ops.github.io/sitemap-index.xml
